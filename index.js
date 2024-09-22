@@ -3,7 +3,9 @@ const app = express()
 var morgan = require('morgan')
 const cors = require('cors')
 
+app.use(express.static('dist'))
 app.use(cors())
+
 
 const MAX = 1000000
 const MIN = 100
@@ -68,29 +70,22 @@ app.post('/api/persons', (request, response) => {
     const body = request.body
     
     //Tests
-    if(!body.content){
-        return response.status(400).json({
-            error: 'content missing'
-        })
-    }
-
-    if(!body.content.name || !body.content.number){
+    if(!body.name || !body.number){
         return response.status(400).json({
             error: 'name or number missing'
         })
     }
 
-    if(contacts.find( contact => contact.name === body.content.name)){
+    if(contacts.find( contact => contact.name === body.name)){
         return response.status(400).json({
             error: 'name must be unique'
         })
     }
 
-
     const contact = {
         id: generateID(),
-        name: body.content.name,
-        number: body.content.number
+        name: body.name,
+        number: body.number
     } 
 
     contacts = contacts.concat(contact)
