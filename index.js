@@ -49,7 +49,7 @@ let contacts = [
 ]
 
 app.get('/api/persons',(request, response) => {
-    response.json(contacts)
+    Contact.find({}).then( result => response.json(result))
 })
 app.get('/info', (request, response) => {
     const date = new Date()
