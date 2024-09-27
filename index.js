@@ -26,24 +26,26 @@ const generateID = () => {
 }
 
 
-app.get('/api/persons',(request, response) => {
+app.get('/api/persons',(request, response, next) => {
     Contact.find({}).then( result => response.json(result))
 })
-app.get('/info', (request, response) => {
+app.get('/info', (request, response, next) => {
     const date = new Date()
-    response.send(`<p>Phonebook has info for ${contacts.length} people</p>
-    <p>${date}</p>`)
+    Contact.countDocuments({})
+        .then( count => {
+        response.send(`<p>Phonebook has info for ${count} people</p>
+        <p>${date}</p>`)
+        })
+        .catch(error => next(error))
 })
 
-app.get('/api/persons/:id', (req, res) => {
-    const id = req.params.id
-    contact = contacts.find( contact => contact.id === id)
+app.get('/api/persons/:id', (req, res, next) => {
 
-    if(contact){
-        res.json(contact)
-    }else{
-        res.status(404).end()
-    }
+    Contact.findById(req.params.id)
+        .then(contact => {
+            response.json(contact)
+        })
+        .catch(error => next(error))
 })
 
 app.post('/api/persons', (request, response) => {
@@ -55,16 +57,7 @@ app.post('/api/persons', (request, response) => {
             error: 'name or number missing'
         })
     }
-    //Ignored on exercise 3.14
-    /*
-    Contact.find({ name: body.name })
-        .then(() => {
-            return response.status(400).json({
-                error: 'name must be unique'
-            })
-        })*/
 
-    
     const contact = new Contact({
         id: generateID(),
         name: body.name,
