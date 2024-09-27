@@ -77,12 +77,14 @@ app.post('/api/persons', (request, response) => {
             error: 'name or number missing'
         })
     }
+    //Ignored on exercise 3.14
+    /*
     Contact.find({ name: body.name })
         .then(() => {
             return response.status(400).json({
                 error: 'name must be unique'
             })
-        })
+        })*/
 
     
     const contact = new Contact({
