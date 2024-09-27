@@ -25,28 +25,6 @@ const generateID = () => {
     return Math.floor(Math.random() * ( MAX - MIN + 1)) + MIN
 }
 
-let contacts = [
-    { 
-      "id": "1",
-      "name": "Arto Hellas", 
-      "number": "040-123456"
-    },
-    { 
-      "id": "2",
-      "name": "Ada Lovelace", 
-      "number": "39-44-5323523"
-    },
-    { 
-      "id": "3",
-      "name": "Dan Abramov", 
-      "number": "12-43-234345"
-    },
-    { 
-      "id": "4",
-      "name": "Mary Poppendieck", 
-      "number": "39-23-6423122"
-    }
-]
 
 app.get('/api/persons',(request, response) => {
     Contact.find({}).then( result => response.json(result))
@@ -95,6 +73,22 @@ app.post('/api/persons', (request, response) => {
     contact.save().then(savedContact => {
         response.json(savedContact)
     })
+})
+
+app.put('/api/persons/:id', (request, response, next) => {
+    const body = request.body
+
+    const contact = {
+        id: generateID(),
+        name: body.name,
+        number: body.number
+    }
+
+    Contact.findByIdAndUpdate( request.params.id, contact, { new: true})
+    .then( updatedContact => {
+        response.json(updatedContact)
+    })
+    .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response, next) => {
