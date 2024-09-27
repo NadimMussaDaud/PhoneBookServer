@@ -1,7 +1,9 @@
+require('dotenv').config()
 const express = require('express')
 const app = express()
 var morgan = require('morgan')
 const cors = require('cors')
+const Contact = require('./models/contact')
 
 app.use(express.static('dist'))
 app.use(cors())
@@ -70,27 +72,27 @@ app.post('/api/persons', (request, response) => {
     const body = request.body
     
     //Tests
-    if(!body.name || !body.number){
+    if(!body.name === undefined || !body.number === undefined ){
         return response.status(400).json({
             error: 'name or number missing'
         })
     }
-
-    if(contacts.find( contact => contact.name === body.name)){
-        return response.status(400).json({
-            error: 'name must be unique'
+    Contact.find({ name: body.name })
+        .then(() => {
+            return response.status(400).json({
+                error: 'name must be unique'
+            })
         })
-    }
 
-    const contact = {
+    
+    const contact = new Contact({
         id: generateID(),
         name: body.name,
-        number: body.number
-    } 
-
-    contacts = contacts.concat(contact)
-
-    response.json(contact)
+        number: body.number,
+    })
+    contact.save().then(savedContact => {
+        response.json(savedContact)
+    })
 })
 
 app.delete('/api/persons/:id', (request, response) => {
@@ -101,7 +103,7 @@ app.delete('/api/persons/:id', (request, response) => {
 })
 
 
-const PORT = process.env.PORT || 3001
+const PORT = process.env.PORT 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
